@@ -5,90 +5,121 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>🐱 がっこうナワバリゲーム</title>
 <style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: -apple-system, 'Helvetica Neue', sans-serif; background: #f5f2eb; min-height: 100vh; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, 'Helvetica Neue', sans-serif; background: #f5f2eb; min-height: 100vh; }
 
-  /* ===== AUTH ===== */
-  #auth-screen { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; padding: 24px; }
-  .auth-card { background: white; border-radius: 20px; padding: 32px 24px; width: 100%; max-width: 360px; border: 0.5px solid #e0ddd6; }
-  .auth-title { font-size: 22px; font-weight: 500; text-align: center; margin-bottom: 6px; }
-  .auth-sub { font-size: 13px; color: #888; text-align: center; margin-bottom: 28px; }
-  .auth-input { width: 100%; border: 0.5px solid #d0cdc6; border-radius: 10px; padding: 11px 14px; font-size: 14px; margin-bottom: 10px; outline: none; }
-  .auth-input:focus { border-color: #378ADD; }
-  .btn-primary { width: 100%; padding: 12px; font-size: 14px; font-weight: 500; border-radius: 10px; border: none; background: #1D9E75; color: white; cursor: pointer; margin-bottom: 10px; }
-  .btn-primary:hover { opacity: .9; }
-  .btn-google { width: 100%; padding: 12px; font-size: 14px; font-weight: 500; border-radius: 10px; border: 0.5px solid #d0cdc6; background: white; color: #333; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; }
-  .btn-google:hover { background: #f8f8f8; }
-  .auth-divider { display: flex; align-items: center; gap: 10px; margin: 14px 0; color: #bbb; font-size: 12px; }
-  .auth-divider::before, .auth-divider::after { content: ''; flex: 1; height: 0.5px; background: #e0ddd6; }
-  .auth-toggle { font-size: 13px; color: #888; text-align: center; margin-top: 16px; }
-  .auth-toggle a { color: #1D9E75; cursor: pointer; text-decoration: none; }
-  .auth-error { font-size: 12px; color: #D85A30; margin-bottom: 10px; text-align: center; min-height: 18px; }
+/* AUTH */
+#auth-screen { display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:100vh; padding:24px; }
+.auth-card { background:white; border-radius:20px; padding:32px 24px; width:100%; max-width:360px; border:0.5px solid #e0ddd6; }
+.auth-title { font-size:22px; font-weight:500; text-align:center; margin-bottom:6px; }
+.auth-sub { font-size:13px; color:#888; text-align:center; margin-bottom:28px; }
+.auth-input { width:100%; border:0.5px solid #d0cdc6; border-radius:10px; padding:11px 14px; font-size:14px; margin-bottom:10px; outline:none; }
+.auth-input:focus { border-color:#378ADD; }
+.btn-primary { width:100%; padding:12px; font-size:14px; font-weight:500; border-radius:10px; border:none; background:#1D9E75; color:white; cursor:pointer; margin-bottom:10px; }
+.btn-google { width:100%; padding:12px; font-size:14px; font-weight:500; border-radius:10px; border:0.5px solid #d0cdc6; background:white; color:#333; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; }
+.auth-divider { display:flex; align-items:center; gap:10px; margin:14px 0; color:#bbb; font-size:12px; }
+.auth-divider::before,.auth-divider::after { content:''; flex:1; height:0.5px; background:#e0ddd6; }
+.auth-toggle { font-size:13px; color:#888; text-align:center; margin-top:16px; }
+.auth-toggle a { color:#1D9E75; cursor:pointer; }
+.auth-error { font-size:12px; color:#D85A30; margin-bottom:10px; text-align:center; min-height:18px; }
 
-  /* ===== MAIN APP ===== */
-  #app-screen { display: none; flex-direction: column; min-height: 100vh; }
-  .topbar { background: white; padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; border-bottom: 0.5px solid #e0ddd6; position: sticky; top: 0; z-index: 10; }
-  .topbar-title { font-size: 15px; font-weight: 500; }
-  .pt-badge { background: #FAEEDA; color: #633806; border-radius: 12px; padding: 3px 10px; font-size: 12px; font-weight: 500; }
+/* APP */
+#app-screen { display:none; flex-direction:column; min-height:100vh; }
+.topbar { background:white; padding:12px 16px; display:flex; align-items:center; justify-content:space-between; border-bottom:0.5px solid #e0ddd6; position:sticky; top:0; z-index:10; }
+.topbar-title { font-size:15px; font-weight:500; }
+.pt-badge { background:#FAEEDA; color:#633806; border-radius:12px; padding:3px 10px; font-size:12px; font-weight:500; }
 
-  /* MAP TABS */
-  .map-tabs { display: flex; background: white; border-bottom: 0.5px solid #e0ddd6; }
-  .map-tab { flex: 1; padding: 10px 4px; font-size: 12px; font-weight: 500; text-align: center; color: #888; border: none; background: none; cursor: pointer; border-bottom: 2px solid transparent; }
-  .map-tab.active { color: #1D9E75; border-bottom-color: #1D9E75; }
+/* MAP TABS */
+.map-tabs { display:flex; background:white; border-bottom:0.5px solid #e0ddd6; }
+.map-tab { flex:1; padding:10px 4px; font-size:12px; font-weight:500; text-align:center; color:#888; border:none; background:none; cursor:pointer; border-bottom:2px solid transparent; }
+.map-tab.active { color:#1D9E75; border-bottom-color:#1D9E75; }
 
-  /* MAP CANVAS */
-  .map-container { padding: 12px; }
-  .map-canvas { position: relative; background: #edeae2; border-radius: 12px; overflow: hidden; width: 100%; }
-  .map-canvas.route-map { height: 280px; }
-  .map-canvas.outside-map { height: 340px; }
-  .map-canvas.inside-map { height: 380px; }
+/* MAP */
+.map-container { padding:12px 12px 0; }
+.map-canvas { position:relative; background:#edeae2; border-radius:12px; overflow:hidden; width:100%; height:320px; }
+.road { position:absolute; background:white; opacity:.7; border-radius:3px; }
+.place-block { position:absolute; border-radius:8px; display:flex; flex-direction:column; align-items:center; justify-content:center; cursor:pointer; transition:transform .12s, background .3s, border-color .3s; border:1.5px solid #b0ada6; background:#c8c4bc; user-select:none; }
+.place-block:active { transform:scale(.94); }
+.place-block.fog::after { content:'?'; font-size:18px; color:#aaa; font-weight:500; }
+.place-block.fog .pb-emoji,.place-block.fog .pb-name { display:none; }
+.pb-emoji { font-size:18px; line-height:1; }
+.pb-name { font-size:9px; font-weight:500; margin-top:2px; text-align:center; line-height:1.3; padding:0 2px; }
+.pb-badge { position:absolute; top:-9px; right:-9px; width:20px; height:20px; border-radius:50%; background:white; border:1.5px solid #ccc; display:flex; align-items:center; justify-content:center; font-size:12px; z-index:3; }
+.pb-photo-dot { position:absolute; bottom:-6px; left:50%; transform:translateX(-50%); width:8px; height:8px; border-radius:50%; background:#378ADD; border:1.5px solid white; }
 
-  .place-block { position: absolute; border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; transition: transform .12s, background .3s, border-color .3s; border: 1.5px solid #b0ada6; background: #c8c4bc; user-select: none; }
-  .place-block:active { transform: scale(.94); }
-  .place-block.fog::after { content: '?'; font-size: 20px; color: #aaa; font-weight: 500; }
-  .place-block.fog .pb-emoji, .place-block.fog .pb-name { display: none; }
-  .pb-emoji { font-size: 20px; line-height: 1; }
-  .pb-name { font-size: 9px; font-weight: 500; margin-top: 2px; text-align: center; line-height: 1.3; padding: 0 2px; }
-  .pb-badge { position: absolute; top: -9px; right: -9px; width: 20px; height: 20px; border-radius: 50%; background: white; border: 1.5px solid #ccc; display: flex; align-items: center; justify-content: center; font-size: 12px; z-index: 3; }
+.map-hint { font-size:11px; color:#aaa; text-align:center; padding:6px 0 10px; }
+.add-place-btn { display:block; width:calc(100% - 24px); margin:8px 12px; padding:10px; font-size:13px; font-weight:500; border:1.5px dashed #b0ada6; border-radius:10px; background:transparent; color:#888; cursor:pointer; text-align:center; }
+.add-place-btn:hover { border-color:#1D9E75; color:#1D9E75; }
 
-  /* ROAD (route map) */
-  .road { position: absolute; background: white; opacity: .7; border-radius: 3px; }
+/* BOTTOM SHEET AREA */
+.bottom-area { background:white; border-top:0.5px solid #e0ddd6; }
+.idle-hint { padding:16px; font-size:13px; color:#888; text-align:center; }
 
-  /* PICKER SHEET */
-  .picker-sheet { background: white; border-top: 0.5px solid #e0ddd6; padding: 16px; }
-  .picker-place { font-size: 14px; font-weight: 500; margin-bottom: 12px; display: flex; align-items: center; gap: 6px; }
-  .feel-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
-  .feel-card { border-radius: 12px; padding: 12px 6px 10px; border: 1.5px solid #e0ddd6; background: #f8f6f2; cursor: pointer; text-align: center; transition: all .14s; }
-  .feel-card:hover { transform: scale(1.04); }
-  .feel-card.selected { border-width: 2px; }
-  .feel-card .fc-icon { font-size: 26px; display: block; }
-  .feel-card .fc-label { font-size: 10px; font-weight: 500; display: block; margin-top: 4px; }
-  .btn-confirm { display: block; width: 100%; margin-top: 12px; padding: 12px; font-size: 14px; font-weight: 500; border-radius: 12px; border: none; color: white; background: #1D9E75; cursor: pointer; }
-  .btn-confirm:disabled { background: #c0c0c0; cursor: default; }
+/* DETAIL SHEET */
+.detail-sheet { padding:16px; }
+.detail-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; }
+.detail-name-row { display:flex; align-items:center; gap:8px; }
+.detail-emoji { font-size:22px; }
+.detail-name { font-size:16px; font-weight:500; }
+.btn-edit { font-size:11px; color:#888; border:0.5px solid #e0ddd6; border-radius:8px; padding:4px 10px; background:white; cursor:pointer; }
+.btn-delete { font-size:11px; color:#D85A30; border:0.5px solid #f0c0b0; border-radius:8px; padding:4px 10px; background:white; cursor:pointer; }
 
-  .idle-hint { padding: 16px; font-size: 13px; color: #888; text-align: center; }
+.feel-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-bottom:12px; }
+.feel-card { border-radius:12px; padding:10px 4px 8px; border:1.5px solid #e0ddd6; background:#f8f6f2; cursor:pointer; text-align:center; transition:all .14s; }
+.feel-card:hover { transform:scale(1.04); }
+.feel-card.selected { border-width:2px; }
+.fc-icon { font-size:24px; display:block; }
+.fc-label { font-size:10px; font-weight:500; display:block; margin-top:3px; }
 
-  /* POINTS LOG */
-  .section-title { font-size: 12px; font-weight: 500; color: #888; letter-spacing: .04em; padding: 12px 16px 6px; }
-  .log-item { display: flex; align-items: center; gap: 10px; padding: 10px 16px; border-bottom: 0.5px solid #f0ede6; }
-  .log-emoji { font-size: 18px; }
-  .log-info { flex: 1; }
-  .log-name { font-size: 13px; font-weight: 500; }
-  .log-date { font-size: 11px; color: #aaa; }
-  .log-pt { font-size: 13px; font-weight: 500; color: #BA7517; }
+/* PHOTO */
+.photo-section { margin-bottom:12px; }
+.photo-preview { width:100%; height:140px; object-fit:cover; border-radius:10px; display:block; margin-bottom:8px; }
+.photo-placeholder { width:100%; height:100px; border-radius:10px; border:1.5px dashed #d0cdc6; display:flex; align-items:center; justify-content:center; flex-direction:column; gap:4px; cursor:pointer; margin-bottom:8px; color:#aaa; font-size:12px; }
+.photo-placeholder:hover { border-color:#1D9E75; color:#1D9E75; }
+.btn-photo { font-size:12px; color:#378ADD; border:0.5px solid #b5d4f4; border-radius:8px; padding:5px 12px; background:#e6f1fb; cursor:pointer; }
+.btn-photo-del { font-size:12px; color:#D85A30; border:0.5px solid #f0c0b0; border-radius:8px; padding:5px 12px; background:#faece7; cursor:pointer; }
 
-  /* TOAST */
-  .toast { position: fixed; top: 70px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,.75); color: white; border-radius: 20px; padding: 6px 16px; font-size: 12px; font-weight: 500; white-space: nowrap; opacity: 0; transition: opacity .2s; pointer-events: none; z-index: 100; }
-  .toast.show { opacity: 1; }
+/* MEMO */
+.memo-box { width:100%; border:0.5px solid #e0ddd6; border-radius:10px; padding:10px; font-size:13px; resize:none; height:70px; outline:none; font-family:inherit; color:#333; background:#faf9f6; }
+.memo-box:focus { border-color:#1D9E75; }
 
-  /* BOTTOM NAV */
-  .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: white; border-top: 0.5px solid #e0ddd6; display: flex; z-index: 10; }
-  .nav-item { flex: 1; padding: 10px 4px 14px; text-align: center; cursor: pointer; font-size: 10px; color: #aaa; border: none; background: none; }
-  .nav-item.active { color: #1D9E75; }
-  .nav-icon { font-size: 22px; display: block; }
-  .page-content { padding-bottom: 80px; }
+.btn-confirm { display:block; width:100%; margin-top:10px; padding:11px; font-size:14px; font-weight:500; border-radius:12px; border:none; color:white; background:#1D9E75; cursor:pointer; }
+.btn-confirm:disabled { background:#c0c0c0; cursor:default; }
+.btn-close { font-size:20px; color:#aaa; border:none; background:none; cursor:pointer; padding:4px; }
 
-  .loading { display: flex; align-items: center; justify-content: center; min-height: 100vh; font-size: 14px; color: #888; }
+/* EDIT MODAL */
+.modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,.45); display:flex; align-items:center; justify-content:center; z-index:50; padding:24px; }
+.modal-card { background:white; border-radius:16px; padding:24px; width:100%; max-width:340px; }
+.modal-title { font-size:15px; font-weight:500; margin-bottom:16px; }
+.modal-input { width:100%; border:0.5px solid #d0cdc6; border-radius:10px; padding:10px 14px; font-size:14px; margin-bottom:10px; outline:none; }
+.modal-input:focus { border-color:#1D9E75; }
+.emoji-grid { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:16px; }
+.emoji-opt { width:36px; height:36px; border-radius:8px; border:1.5px solid #e0ddd6; background:#f8f6f2; font-size:18px; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+.emoji-opt.selected { border-color:#1D9E75; background:#e1f5ee; }
+.modal-row { display:flex; gap:8px; }
+.btn-cancel { flex:1; padding:10px; font-size:13px; border-radius:10px; border:0.5px solid #e0ddd6; background:white; cursor:pointer; color:#666; }
+.btn-save { flex:1; padding:10px; font-size:13px; font-weight:500; border-radius:10px; border:none; background:#1D9E75; color:white; cursor:pointer; }
+
+/* POINTS PAGE */
+.section-title { font-size:12px; font-weight:500; color:#888; letter-spacing:.04em; padding:14px 16px 6px; }
+.log-item { display:flex; align-items:center; gap:10px; padding:10px 16px; border-bottom:0.5px solid #f0ede6; }
+.log-emoji { font-size:18px; }
+.log-info { flex:1; }
+.log-name { font-size:13px; font-weight:500; }
+.log-date { font-size:11px; color:#aaa; }
+.log-pt { font-size:13px; font-weight:500; color:#BA7517; }
+
+/* BOTTOM NAV */
+.bottom-nav { position:fixed; bottom:0; left:0; right:0; background:white; border-top:0.5px solid #e0ddd6; display:flex; z-index:10; }
+.nav-item { flex:1; padding:10px 4px 14px; text-align:center; cursor:pointer; font-size:10px; color:#aaa; border:none; background:none; }
+.nav-item.active { color:#1D9E75; }
+.nav-icon { font-size:22px; display:block; }
+.page-content { padding-bottom:80px; }
+
+.toast { position:fixed; top:70px; left:50%; transform:translateX(-50%); background:rgba(0,0,0,.75); color:white; border-radius:20px; padding:6px 16px; font-size:12px; font-weight:500; white-space:nowrap; opacity:0; transition:opacity .2s; pointer-events:none; z-index:100; }
+.toast.show { opacity:1; }
+.loading { display:flex; align-items:center; justify-content:center; min-height:100vh; font-size:14px; color:#888; }
+input[type=file] { display:none; }
 </style>
 </head>
 <body>
@@ -109,19 +140,29 @@
       <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.875 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z"/><path fill="#FBBC05" d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 6.29C4.672 4.163 6.656 3.58 9 3.58z"/></svg>
       Googleでログイン
     </button>
-    <div class="auth-toggle" id="auth-toggle">
-      アカウントがない場合は <a onclick="toggleAuthMode()">新規登録</a>
+    <div class="auth-toggle" id="auth-toggle">アカウントがない場合は <a onclick="toggleAuthMode()">新規登録</a></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- EDIT MODAL -->
+<div class="modal-overlay" id="edit-modal" style="display:none" onclick="closeModal(event)">
+  <div class="modal-card" onclick="event.stopPropagation()">
+    <div class="modal-title" id="modal-title">場所を編集</div>
+    <div class="emoji-grid" id="emoji-grid"></div>
+    <input class="modal-input" id="modal-name" placeholder="場所の名前">
+    <div class="modal-row">
+      <button class="btn-cancel" onclick="closeEditModal()">キャンセル</button>
+      <button class="btn-save" onclick="saveEdit()">保存</button>
     </div>
   </div>
 </div>
 
-<!-- TOAST -->
-<div class="toast" id="toast"></div>
-
 <!-- MAIN APP -->
 <div id="app-screen" style="display:none">
   <div class="topbar">
-    <span class="topbar-title" id="topbar-title">🐱 ナワバリゲーム</span>
+    <span class="topbar-title">🐱 ナワバリゲーム</span>
     <div style="display:flex;align-items:center;gap:8px">
       <span class="pt-badge" id="pt-display">0 pt</span>
       <button onclick="logout()" style="font-size:11px;color:#aaa;border:none;background:none;cursor:pointer">ログアウト</button>
@@ -136,12 +177,27 @@
       <button class="map-tab" onclick="switchMap('inside')">🏛️ 校舎内</button>
     </div>
     <div class="map-container">
-      <div class="map-canvas route-map" id="map-canvas"></div>
+      <div class="map-canvas" id="map-canvas"></div>
     </div>
-    <div id="picker-area">
+    <div class="map-hint">タップでナワバリ度をつける　長押しで編集</div>
+    <button class="add-place-btn" onclick="openAddModal()">＋ 場所を追加する</button>
+
+    <div class="bottom-area" id="bottom-area">
       <div class="idle-hint" id="idle-hint">🐾 グレーの場所をタップしてナワバリ度をつけよう</div>
-      <div class="picker-sheet" id="picker-sheet" style="display:none">
-        <div class="picker-place" id="picker-place-name"></div>
+      <div class="detail-sheet" id="detail-sheet" style="display:none">
+        <div class="detail-header">
+          <div class="detail-name-row">
+            <span class="detail-emoji" id="d-emoji"></span>
+            <span class="detail-name" id="d-name"></span>
+          </div>
+          <div style="display:flex;gap:6px;align-items:center">
+            <button class="btn-edit" onclick="openEditModal()">編集</button>
+            <button class="btn-delete" onclick="deletePlace()">削除</button>
+            <button class="btn-close" onclick="closeDetail()">×</button>
+          </div>
+        </div>
+
+        <!-- FEEL -->
         <div class="feel-grid">
           <div class="feel-card" id="fc0" onclick="selectFeel(0)">
             <span class="fc-icon">😊</span>
@@ -156,7 +212,25 @@
             <span class="fc-label" style="color:#712B13">警戒バリバリ</span>
           </div>
         </div>
-        <button class="btn-confirm" id="btn-confirm" disabled onclick="confirmFeel()">ナワバリに追加する</button>
+
+        <!-- PHOTO -->
+        <div class="photo-section">
+          <img id="photo-preview" class="photo-preview" style="display:none">
+          <div class="photo-placeholder" id="photo-placeholder" onclick="triggerPhoto()">
+            <span style="font-size:28px">📷</span>
+            <span>写真をとる / えらぶ</span>
+          </div>
+          <div style="display:flex;gap:8px">
+            <button class="btn-photo" onclick="triggerPhoto()">📷 写真を変える</button>
+            <button class="btn-photo-del" id="btn-photo-del" onclick="deletePhoto()" style="display:none">🗑 写真を削除</button>
+          </div>
+        </div>
+        <input type="file" id="photo-input" accept="image/*" capture="environment" onchange="handlePhoto(event)">
+
+        <!-- MEMO -->
+        <textarea class="memo-box" id="memo-input" placeholder="メモ（安心なところ、こわいところ…）"></textarea>
+
+        <button class="btn-confirm" id="btn-confirm" onclick="confirmFeel()">ナワバリに追加する</button>
       </div>
     </div>
   </div>
@@ -167,7 +241,6 @@
     <div id="points-log"></div>
   </div>
 
-  <!-- BOTTOM NAV -->
   <div class="bottom-nav">
     <button class="nav-item active" id="nav-map" onclick="switchPage('map')">
       <span class="nav-icon">🗺️</span>マップ
@@ -178,11 +251,10 @@
   </div>
 </div>
 
-<!-- FIREBASE -->
 <script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
 import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, signOut } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
-import { getFirestore, doc, getDoc, setDoc, collection, addDoc, getDocs, query, orderBy, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+import { getFirestore, doc, getDoc, setDoc, deleteDoc, collection, addDoc, getDocs, query, orderBy, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
 
 const firebaseConfig = {
   apiKey: "AIzaSyBlwjwiAbTUQxYDY6eMCkVZ7xliWtMZ4Zw",
@@ -198,76 +270,111 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 const googleProvider = new GoogleAuthProvider();
 
-// ===== PLACE MASTER DATA =====
-const MAPS = {
-  route: {
-    label: 'ルート',
-    canvasClass: 'route-map',
-    roads: [
-      { x: 130, y: 0, w: 20, h: 280 },
-    ],
-    places: [
-      { id: 'home',        name: '家',           emoji: '🏠', x: 90,  y: 20,  w: 70, h: 60 },
-      { id: 'route_mid1', name: 'こうえん前',    emoji: '🌳', x: 90,  y: 110, w: 70, h: 60 },
-      { id: 'route_mid2', name: 'おおきいみち',  emoji: '🚦', x: 90,  y: 200, w: 70, h: 60 },
-      { id: 'seimon',     name: '正門',          emoji: '🚪', x: 185, y: 110, w: 70, h: 60 },
-    ]
-  },
-  outside: {
-    label: '校舎外',
-    canvasClass: 'outside-map',
-    roads: [],
-    places: [
-      { id: 'seimon_out',       name: '正門',           emoji: '🚪', x: 120, y: 10,  w: 80, h: 55 },
-      { id: 'entrance_student', name: '生徒用入り口',   emoji: '🎒', x: 10,  y: 10,  w: 90, h: 55 },
-      { id: 'entrance_staff',   name: '職員用入り口',   emoji: '🚶', x: 220, y: 10,  w: 90, h: 55 },
-      { id: 'gym',              name: '体育館',          emoji: '🏃', x: 10,  y: 100, w: 130, h: 80, special: true },
-      { id: 'pool',             name: 'プール',          emoji: '🏊', x: 170, y: 100, w: 140, h: 80 },
-      { id: 'gakudo',           name: '学童',            emoji: '🏠', x: 10,  y: 220, w: 120, h: 70 },
-    ]
-  },
-  inside: {
-    label: '校舎内',
-    canvasClass: 'inside-map',
-    roads: [
-      { x: 0, y: 165, w: 320, h: 18 },
-    ],
-    places: [
-      { id: 'corridor_gym',      name: '体育館の廊下',        emoji: '🚶', x: 10,  y: 10,  w: 140, h: 55 },
-      { id: 'toilet_gym',        name: 'トイレ（体育館側）', emoji: '🚻', x: 170, y: 10,  w: 140, h: 55 },
-      { id: 'support_common',    name: '支援教室（みんな）', emoji: '👥', x: 10,  y: 90,  w: 140, h: 65 },
-      { id: 'support_own',       name: '支援教室（自分の机）', emoji: '🪑', x: 170, y: 90,  w: 140, h: 65, special: true },
-      { id: 'toilet_support',    name: 'トイレ（支援側）',   emoji: '🚻', x: 10,  y: 200, w: 90,  h: 55 },
-      { id: 'art_room',          name: '図工室',              emoji: '🎨', x: 120, y: 200, w: 90,  h: 55 },
-      { id: 'pc_room',           name: 'パソコン室',          emoji: '💻', x: 230, y: 200, w: 80,  h: 55 },
-      { id: 'library',           name: '図書ホール',          emoji: '📚', x: 10,  y: 300, w: 300, h: 60 },
-    ]
-  }
+// ===== DEFAULT PLACES =====
+const DEFAULT_PLACES = {
+  route: [
+    { id:'home',        name:'家',           emoji:'🏠', x:90,  y:20,  w:70, h:55, special:false },
+    { id:'route_mid1',  name:'とちゅう①',   emoji:'🌳', x:90,  y:110, w:70, h:55, special:false },
+    { id:'route_mid2',  name:'おおきいみち', emoji:'🚦', x:90,  y:190, w:70, h:55, special:false },
+    { id:'seimon',      name:'正門',         emoji:'🚪', x:185, y:110, w:70, h:55, special:false },
+  ],
+  outside: [
+    { id:'seimon_out',        name:'正門',         emoji:'🚪', x:110, y:10,  w:80, h:55, special:false },
+    { id:'entrance_student',  name:'生徒用入り口', emoji:'🎒', x:10,  y:10,  w:90, h:55, special:false },
+    { id:'entrance_staff',    name:'職員用入り口', emoji:'🚶', x:210, y:10,  w:90, h:55, special:false },
+    { id:'gym',               name:'体育館',       emoji:'🏃', x:10,  y:100, w:130,h:75, special:true  },
+    { id:'pool',              name:'プール',       emoji:'🏊', x:165, y:100, w:135,h:75, special:false },
+    { id:'gakudo',            name:'学童',         emoji:'🏠', x:10,  y:205, w:120,h:65, special:false },
+  ],
+  inside: [
+    { id:'corridor_gym',    name:'体育館の廊下',       emoji:'🚶', x:10,  y:10,  w:140,h:55, special:false },
+    { id:'toilet_gym',      name:'トイレ（体育館側）', emoji:'🚻', x:165, y:10,  w:130,h:55, special:false },
+    { id:'support_common',  name:'支援教室（みんな）', emoji:'👥', x:10,  y:90,  w:140,h:65, special:false },
+    { id:'support_own',     name:'支援教室（自分の机）',emoji:'🪑',x:165, y:90,  w:130,h:65, special:true  },
+    { id:'toilet_support',  name:'トイレ（支援側）',   emoji:'🚻', x:10,  y:185, w:90, h:55, special:false },
+    { id:'art_room',        name:'図工室',             emoji:'🎨', x:115, y:185, w:90, h:55, special:false },
+    { id:'pc_room',         name:'パソコン室',         emoji:'💻', x:220, y:185, w:75, h:55, special:false },
+    { id:'library',         name:'図書ホール',         emoji:'📚', x:10,  y:265, w:285,h:55, special:false },
+  ]
 };
 
+const MAP_ROADS = {
+  route:   [{ x:128, y:0, w:16, h:280 }],
+  outside: [],
+  inside:  [{ x:0, y:160, w:310, h:14 }]
+};
+
+const MAP_HEIGHTS = { route:300, outside:300, inside:345 };
+
 const FEELS = [
-  { emoji: '😊', label: '安心',        color: '#1D9E75', border: '#0F6E56', textColor: '#085041', pts: 30 },
-  { emoji: '😐', label: 'まだ警戒',    color: '#EF9F27', border: '#BA7517', textColor: '#633806', pts: 20 },
-  { emoji: '😰', label: '警戒バリバリ', color: '#D85A30', border: '#993C1D', textColor: '#712B13', pts: 10 },
+  { emoji:'😊', label:'安心',         color:'#1D9E75', border:'#0F6E56', textColor:'#085041', pts:30 },
+  { emoji:'😐', label:'まだ警戒',     color:'#EF9F27', border:'#BA7517', textColor:'#633806', pts:20 },
+  { emoji:'😰', label:'警戒バリバリ', color:'#D85A30', border:'#993C1D', textColor:'#712B13', pts:10 },
 ];
+
+const EMOJIS = ['🏫','🚪','🎒','🚶','🏃','🏊','🏠','🚻','👥','🪑','🎨','💻','📚','🌳','🚦','⭐','🏥','🍱','🎵','🌸'];
 
 // ===== STATE =====
 let currentUser = null;
 let nawabariState = {};
+let placesData = { route:[], outside:[], inside:[] };
 let totalPts = 0;
 let currentMap = 'route';
 let activePick = null;
 let selectedFeel = -1;
 let isLoginMode = true;
+let editTarget = null;
+let editMode = 'edit';
+let selectedEmoji = '🏠';
+let pendingPhotoData = null;
+let currentPhotoData = null;
 
-// ===== AUTH STATE =====
+// ===== IndexedDB =====
+let idb = null;
+function openIDB() {
+  return new Promise((res, rej) => {
+    const req = indexedDB.open('nawabari-photos', 1);
+    req.onupgradeneeded = e => e.target.result.createObjectStore('photos', { keyPath: 'id' });
+    req.onsuccess = e => res(e.target.result);
+    req.onerror = () => rej();
+  });
+}
+async function savePhoto(id, dataUrl) {
+  if (!idb) idb = await openIDB();
+  return new Promise((res, rej) => {
+    const tx = idb.transaction('photos', 'readwrite');
+    tx.objectStore('photos').put({ id, dataUrl });
+    tx.oncomplete = res;
+    tx.onerror = rej;
+  });
+}
+async function loadPhoto(id) {
+  if (!idb) idb = await openIDB();
+  return new Promise((res) => {
+    const tx = idb.transaction('photos', 'readonly');
+    const req = tx.objectStore('photos').get(id);
+    req.onsuccess = e => res(e.target.result ? e.target.result.dataUrl : null);
+    req.onerror = () => res(null);
+  });
+}
+async function deletePhotoFromIDB(id) {
+  if (!idb) idb = await openIDB();
+  return new Promise((res) => {
+    const tx = idb.transaction('photos', 'readwrite');
+    tx.objectStore('photos').delete(id);
+    tx.oncomplete = res;
+  });
+}
+
+// ===== AUTH =====
 onAuthStateChanged(auth, user => {
   document.getElementById('loading').style.display = 'none';
   if (user) {
     currentUser = user;
     document.getElementById('auth-screen').style.display = 'none';
-    document.getElementById('app-screen').style.display = 'flex';
-    document.getElementById('app-screen').style.flexDirection = 'column';
+    const appEl = document.getElementById('app-screen');
+    appEl.style.display = 'flex';
+    appEl.style.flexDirection = 'column';
     loadData();
   } else {
     currentUser = null;
@@ -276,7 +383,6 @@ onAuthStateChanged(auth, user => {
   }
 });
 
-// ===== AUTH FUNCTIONS =====
 window.toggleAuthMode = () => {
   isLoginMode = !isLoginMode;
   document.getElementById('auth-sub').textContent = isLoginMode ? 'ログインしてはじめよう' : 'あたらしいアカウントをつくる';
@@ -292,84 +398,89 @@ window.submitAuth = async () => {
   const password = document.getElementById('auth-password').value;
   document.getElementById('auth-error').textContent = '';
   try {
-    if (isLoginMode) {
-      await signInWithEmailAndPassword(auth, email, password);
-    } else {
-      await createUserWithEmailAndPassword(auth, email, password);
-    }
+    if (isLoginMode) await signInWithEmailAndPassword(auth, email, password);
+    else await createUserWithEmailAndPassword(auth, email, password);
   } catch (e) {
     const msgs = {
-      'auth/user-not-found': 'メールアドレスが見つかりません',
-      'auth/wrong-password': 'パスワードが違います',
-      'auth/email-already-in-use': 'このメールアドレスはすでに登録済みです',
-      'auth/weak-password': 'パスワードは6文字以上にしてください',
-      'auth/invalid-email': 'メールアドレスの形式が正しくありません',
-      'auth/invalid-credential': 'メールアドレスまたはパスワードが違います',
+      'auth/user-not-found':'メールアドレスが見つかりません',
+      'auth/wrong-password':'パスワードが違います',
+      'auth/email-already-in-use':'このメールアドレスはすでに登録済みです',
+      'auth/weak-password':'パスワードは6文字以上にしてください',
+      'auth/invalid-email':'メールアドレスの形式が正しくありません',
+      'auth/invalid-credential':'メールアドレスまたはパスワードが違います',
     };
-    document.getElementById('auth-error').textContent = msgs[e.code] || 'エラーが発生しました: ' + e.code;
+    document.getElementById('auth-error').textContent = msgs[e.code] || 'エラー: ' + e.code;
   }
 };
 
 window.loginGoogle = async () => {
-  try {
-    await signInWithPopup(auth, googleProvider);
-  } catch (e) {
-    document.getElementById('auth-error').textContent = 'Googleログインに失敗しました';
-  }
+  try { await signInWithPopup(auth, googleProvider); }
+  catch { document.getElementById('auth-error').textContent = 'Googleログインに失敗しました'; }
 };
 
-window.logout = async () => {
-  await signOut(auth);
-};
+window.logout = async () => { await signOut(auth); };
 
 // ===== LOAD DATA =====
 async function loadData() {
   if (!currentUser) return;
   nawabariState = {};
   totalPts = 0;
+  placesData = { route:[], outside:[], inside:[] };
+
+  // Load custom places from Firestore
+  for (const mapId of ['route','outside','inside']) {
+    const snap = await getDocs(collection(db, 'users', currentUser.uid, 'places_' + mapId));
+    if (snap.empty) {
+      // First time: write defaults
+      for (const p of DEFAULT_PLACES[mapId]) {
+        await setDoc(doc(db, 'users', currentUser.uid, 'places_' + mapId, p.id), p);
+        placesData[mapId].push({...p});
+      }
+    } else {
+      snap.forEach(d => placesData[mapId].push({ id: d.id, ...d.data() }));
+      placesData[mapId].sort((a,b) => (a.order||0) - (b.order||0));
+    }
+  }
 
   // Load nawabari
-  const snap = await getDocs(collection(db, 'users', currentUser.uid, 'nawabari'));
-  snap.forEach(d => { nawabariState[d.id] = d.data().level; });
+  const nsnap = await getDocs(collection(db, 'users', currentUser.uid, 'nawabari'));
+  nsnap.forEach(d => { nawabariState[d.id] = d.data(); });
 
-  // Load total points
+  // Load points
   const psnap = await getDocs(collection(db, 'users', currentUser.uid, 'points'));
   psnap.forEach(d => { totalPts += (d.data().pts || 0); });
 
+  idb = await openIDB();
   updatePtDisplay();
   renderMap(currentMap);
-  renderPointsLog();
 }
 
-// ===== MAP RENDER =====
+// ===== MAP =====
 window.switchMap = (mapId) => {
   currentMap = mapId;
-  document.querySelectorAll('.map-tab').forEach((t, i) => {
+  document.querySelectorAll('.map-tab').forEach((t,i) => {
     t.classList.toggle('active', ['route','outside','inside'][i] === mapId);
   });
-  closePicker();
+  closeDetail();
   renderMap(mapId);
 };
 
 function renderMap(mapId) {
-  const mapData = MAPS[mapId];
   const canvas = document.getElementById('map-canvas');
-  canvas.className = 'map-canvas ' + mapData.canvasClass;
   canvas.innerHTML = '';
+  canvas.style.height = MAP_HEIGHTS[mapId] + 'px';
 
-  // Roads
-  (mapData.roads || []).forEach(r => {
+  (MAP_ROADS[mapId] || []).forEach(r => {
     const el = document.createElement('div');
     el.className = 'road';
     el.style.cssText = `left:${r.x}px;top:${r.y}px;width:${r.w}px;height:${r.h}px;`;
     canvas.appendChild(el);
   });
 
-  // Places
-  mapData.places.forEach(p => {
-    const level = nawabariState[p.id];
-    const hasLevel = level !== undefined && level !== null;
-    const feel = hasLevel ? FEELS[level] : null;
+  (placesData[mapId] || []).forEach(p => {
+    const ns = nawabariState[p.id];
+    const hasLevel = ns && ns.level !== undefined && ns.level !== null;
+    const feel = hasLevel ? FEELS[ns.level] : null;
 
     const el = document.createElement('div');
     el.className = 'place-block' + (hasLevel ? '' : ' fog');
@@ -390,49 +501,89 @@ function renderMap(mapId) {
 
     if (p.special) {
       const star = document.createElement('div');
-      star.style.cssText = 'position:absolute;top:-9px;left:-9px;font-size:14px;';
+      star.style.cssText = 'position:absolute;top:-9px;left:-9px;font-size:13px;';
       star.textContent = '⭐';
       el.appendChild(star);
     }
 
-    el.onclick = () => openPicker(p, el);
+    // 写真ドット（後で非同期チェック）
+    loadPhoto(p.id).then(dataUrl => {
+      if (dataUrl) {
+        const dot = document.createElement('div');
+        dot.className = 'pb-photo-dot';
+        el.appendChild(dot);
+      }
+    });
+
+    let pressTimer = null;
+    el.addEventListener('mousedown', () => { pressTimer = setTimeout(() => openEditModal(p), 600); });
+    el.addEventListener('touchstart', () => { pressTimer = setTimeout(() => openEditModal(p), 600); }, { passive: true });
+    el.addEventListener('mouseup', () => clearTimeout(pressTimer));
+    el.addEventListener('touchend', () => clearTimeout(pressTimer));
+    el.addEventListener('click', () => { clearTimeout(pressTimer); openDetail(p); });
+
     canvas.appendChild(el);
   });
 }
 
-// ===== PICKER =====
-function openPicker(place, el) {
-  document.querySelectorAll('.place-block').forEach(b => b.style.outline = 'none');
-  el.style.outline = '2.5px solid #378ADD';
-  el.style.outlineOffset = '2px';
-
+// ===== DETAIL / PICKER =====
+function openDetail(place) {
   activePick = place;
   selectedFeel = -1;
+  pendingPhotoData = null;
 
   document.getElementById('idle-hint').style.display = 'none';
-  document.getElementById('picker-sheet').style.display = 'block';
-  document.getElementById('picker-place-name').innerHTML = `<span style="font-size:18px">${place.emoji}</span>${place.name}`;
-  document.getElementById('btn-confirm').disabled = true;
+  document.getElementById('detail-sheet').style.display = 'block';
+  document.getElementById('d-emoji').textContent = place.emoji;
+  document.getElementById('d-name').textContent = place.name;
+  document.getElementById('memo-input').value = nawabariState[place.id]?.memo || '';
 
+  // Feel
+  const curLevel = nawabariState[place.id]?.level;
   [0,1,2].forEach(i => {
     const fc = document.getElementById('fc'+i);
     fc.classList.remove('selected');
     fc.style.background = '';
     fc.style.borderColor = '';
   });
+  if (curLevel !== undefined && curLevel !== null) {
+    selectFeel(curLevel);
+  } else {
+    document.getElementById('btn-confirm').disabled = true;
+    document.getElementById('btn-confirm').textContent = 'ナワバリに追加する';
+  }
 
-  const cur = nawabariState[place.id];
-  if (cur !== undefined && cur !== null) selectFeel(cur);
+  // Photo
+  loadPhoto(place.id).then(dataUrl => {
+    currentPhotoData = dataUrl;
+    updatePhotoUI(dataUrl);
+  });
 }
 
-function closePicker() {
+function updatePhotoUI(dataUrl) {
+  const preview = document.getElementById('photo-preview');
+  const placeholder = document.getElementById('photo-placeholder');
+  const delBtn = document.getElementById('btn-photo-del');
+  if (dataUrl) {
+    preview.src = dataUrl;
+    preview.style.display = 'block';
+    placeholder.style.display = 'none';
+    delBtn.style.display = 'inline-block';
+  } else {
+    preview.style.display = 'none';
+    placeholder.style.display = 'flex';
+    delBtn.style.display = 'none';
+  }
+}
+
+window.closeDetail = () => {
   activePick = null;
   selectedFeel = -1;
-  document.getElementById('picker-sheet').style.display = 'none';
+  pendingPhotoData = null;
+  currentPhotoData = null;
+  document.getElementById('detail-sheet').style.display = 'none';
   document.getElementById('idle-hint').style.display = 'block';
-  document.getElementById('idle-hint').textContent = '🐾 グレーの場所をタップしてナワバリ度をつけよう';
-  document.querySelectorAll('.place-block').forEach(b => b.style.outline = 'none');
-}
+};
 
 window.selectFeel = (idx) => {
   selectedFeel = idx;
@@ -443,47 +594,148 @@ window.selectFeel = (idx) => {
     fc.style.borderColor = i === idx ? FEELS[i].border : '';
   });
   document.getElementById('btn-confirm').disabled = false;
+  document.getElementById('btn-confirm').textContent = 'ナワバリに追加する';
+};
+
+window.triggerPhoto = () => document.getElementById('photo-input').click();
+
+window.handlePhoto = (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    pendingPhotoData = ev.target.result;
+    updatePhotoUI(pendingPhotoData);
+  };
+  reader.readAsDataURL(file);
+  e.target.value = '';
+};
+
+window.deletePhoto = async () => {
+  if (!activePick) return;
+  await deletePhotoFromIDB(activePick.id);
+  pendingPhotoData = null;
+  currentPhotoData = null;
+  updatePhotoUI(null);
+  showToast('写真を削除しました');
+  renderMap(currentMap);
 };
 
 window.confirmFeel = async () => {
   if (!activePick || selectedFeel < 0 || !currentUser) return;
   const place = activePick;
   const feel = FEELS[selectedFeel];
-  const wasSet = nawabariState[place.id] !== undefined && nawabariState[place.id] !== null;
+  const wasSet = nawabariState[place.id]?.level !== undefined && nawabariState[place.id]?.level !== null;
+  const memo = document.getElementById('memo-input').value;
 
-  // Save nawabari level
   await setDoc(doc(db, 'users', currentUser.uid, 'nawabari', place.id), {
-    level: selectedFeel,
-    placeName: place.name,
-    updatedAt: serverTimestamp()
+    level: selectedFeel, placeName: place.name, memo, updatedAt: serverTimestamp()
   });
+  nawabariState[place.id] = { level: selectedFeel, memo };
 
-  nawabariState[place.id] = selectedFeel;
-
-  // Points
-  let pts = wasSet ? 5 : feel.pts;
-  let bonusMsg = '';
-
-  if (!wasSet && place.special && selectedFeel === 0) {
-    pts += 20;
-    bonusMsg = ' ⭐ボーナス！';
+  if (pendingPhotoData) {
+    await savePhoto(place.id, pendingPhotoData);
+    pendingPhotoData = null;
   }
 
+  let pts = wasSet ? 5 : feel.pts;
+  let bonusMsg = '';
+  if (!wasSet && place.special && selectedFeel === 0) { pts += 20; bonusMsg = ' ⭐ボーナス！'; }
+
   await addDoc(collection(db, 'users', currentUser.uid, 'points'), {
-    type: 'nawabari',
-    placeId: place.id,
-    placeName: place.name,
-    feel: feel.label,
-    pts,
-    createdAt: serverTimestamp()
+    type:'nawabari', placeId:place.id, placeName:place.name,
+    feel:feel.label, pts, createdAt:serverTimestamp()
   });
 
   totalPts += pts;
   updatePtDisplay();
   renderMap(currentMap);
-  renderPointsLog();
-  closePicker();
+  closeDetail();
   showToast(`+${pts}pt！${bonusMsg} ナワバリかくだい！`);
+};
+
+// ===== DELETE PLACE =====
+window.deletePlace = async () => {
+  if (!activePick || !currentUser) return;
+  if (!confirm(`「${activePick.name}」を削除しますか？`)) return;
+  await deleteDoc(doc(db, 'users', currentUser.uid, 'places_' + currentMap, activePick.id));
+  await deletePhotoFromIDB(activePick.id);
+  placesData[currentMap] = placesData[currentMap].filter(p => p.id !== activePick.id);
+  closeDetail();
+  renderMap(currentMap);
+  showToast('削除しました');
+};
+
+// ===== EDIT / ADD MODAL =====
+function buildEmojiGrid(selected) {
+  const grid = document.getElementById('emoji-grid');
+  grid.innerHTML = '';
+  EMOJIS.forEach(e => {
+    const btn = document.createElement('button');
+    btn.className = 'emoji-opt' + (e === selected ? ' selected' : '');
+    btn.textContent = e;
+    btn.onclick = () => {
+      document.querySelectorAll('.emoji-opt').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+      selectedEmoji = e;
+    };
+    grid.appendChild(btn);
+  });
+  selectedEmoji = selected;
+}
+
+window.openEditModal = (place) => {
+  editMode = 'edit';
+  editTarget = place || activePick;
+  if (!editTarget) return;
+  document.getElementById('modal-title').textContent = '場所を編集';
+  document.getElementById('modal-name').value = editTarget.name;
+  buildEmojiGrid(editTarget.emoji);
+  document.getElementById('edit-modal').style.display = 'flex';
+};
+
+window.openAddModal = () => {
+  editMode = 'add';
+  editTarget = null;
+  document.getElementById('modal-title').textContent = '場所を追加';
+  document.getElementById('modal-name').value = '';
+  buildEmojiGrid('🏠');
+  document.getElementById('edit-modal').style.display = 'flex';
+};
+
+window.closeEditModal = () => { document.getElementById('edit-modal').style.display = 'none'; };
+window.closeModal = (e) => { if (e.target.id === 'edit-modal') closeEditModal(); };
+
+window.saveEdit = async () => {
+  const name = document.getElementById('modal-name').value.trim();
+  if (!name) { alert('名前を入力してください'); return; }
+  if (!currentUser) return;
+
+  if (editMode === 'edit' && editTarget) {
+    const updated = { ...editTarget, name, emoji: selectedEmoji };
+    await setDoc(doc(db, 'users', currentUser.uid, 'places_' + currentMap, editTarget.id), updated);
+    placesData[currentMap] = placesData[currentMap].map(p => p.id === editTarget.id ? updated : p);
+    if (nawabariState[editTarget.id]) {
+      await setDoc(doc(db, 'users', currentUser.uid, 'nawabari', editTarget.id),
+        { ...nawabariState[editTarget.id], placeName: name }, { merge: true });
+    }
+    showToast('更新しました');
+  } else {
+    const newId = 'place_' + Date.now();
+    const existing = placesData[currentMap];
+    const newPlace = {
+      id: newId, name, emoji: selectedEmoji,
+      x: 10, y: 10 + existing.length * 70,
+      w: 120, h: 55, special: false, order: existing.length
+    };
+    await setDoc(doc(db, 'users', currentUser.uid, 'places_' + currentMap, newId), newPlace);
+    placesData[currentMap].push(newPlace);
+    showToast('追加しました！');
+  }
+
+  closeEditModal();
+  closeDetail();
+  renderMap(currentMap);
 };
 
 // ===== POINTS LOG =====
@@ -491,37 +743,25 @@ async function renderPointsLog() {
   if (!currentUser) return;
   const container = document.getElementById('points-log');
   container.innerHTML = '';
-
-  const q = query(collection(db, 'users', currentUser.uid, 'points'), orderBy('createdAt', 'desc'));
+  const q = query(collection(db, 'users', currentUser.uid, 'points'), orderBy('createdAt','desc'));
   const snap = await getDocs(q);
-
   if (snap.empty) {
     container.innerHTML = '<div style="padding:32px;text-align:center;color:#aaa;font-size:13px">まだポイントがありません<br>マップで場所をナワバリ化しよう！</div>';
     return;
   }
-
+  const feelEmoji = { '安心':'😊', 'まだ警戒':'😐', '警戒バリバリ':'😰' };
   snap.forEach(d => {
     const data = d.data();
-    const date = data.createdAt ? new Date(data.createdAt.seconds * 1000).toLocaleDateString('ja-JP', { month: 'short', day: 'numeric' }) : '';
+    const date = data.createdAt ? new Date(data.createdAt.seconds * 1000).toLocaleDateString('ja-JP',{month:'short',day:'numeric'}) : '';
     const item = document.createElement('div');
     item.className = 'log-item';
-    const feelEmoji = { '安心': '😊', 'まだ警戒': '😐', '警戒バリバリ': '😰' };
-    item.innerHTML = `
-      <span class="log-emoji">${feelEmoji[data.feel] || '⭐'}</span>
-      <div class="log-info">
-        <div class="log-name">${data.placeName || ''}</div>
-        <div class="log-date">${date} · ${data.feel || ''}</div>
-      </div>
-      <span class="log-pt">+${data.pts}pt</span>
-    `;
+    item.innerHTML = `<span class="log-emoji">${feelEmoji[data.feel]||'⭐'}</span><div class="log-info"><div class="log-name">${data.placeName||''}</div><div class="log-date">${date} · ${data.feel||''}</div></div><span class="log-pt">+${data.pts}pt</span>`;
     container.appendChild(item);
   });
 }
 
 // ===== UTILS =====
-function updatePtDisplay() {
-  document.getElementById('pt-display').textContent = totalPts + ' pt';
-}
+function updatePtDisplay() { document.getElementById('pt-display').textContent = totalPts + ' pt'; }
 
 function showToast(msg) {
   const t = document.getElementById('toast');
@@ -537,7 +777,6 @@ window.switchPage = (page) => {
   });
   if (page === 'points') renderPointsLog();
 };
-
 </script>
 </body>
 </html>
