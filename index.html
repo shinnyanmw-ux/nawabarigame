@@ -225,7 +225,7 @@ input[type=file] { display:none; }
             <button class="btn-photo-del" id="btn-photo-del" onclick="deletePhoto()" style="display:none">🗑 写真を削除</button>
           </div>
         </div>
-        <input type="file" id="photo-input" accept="image/*"  onchange="handlePhoto(event)">
+        <input type="file" id="photo-input" accept="image/*" capture="environment" onchange="handlePhoto(event)">
 
         <!-- MEMO -->
         <textarea class="memo-box" id="memo-input" placeholder="メモ（安心なところ、こわいところ…）"></textarea>
