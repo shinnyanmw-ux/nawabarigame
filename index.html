@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🐱 がっこうナワバリゲーム</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, 'Helvetica Neue', sans-serif; background: #f5f2eb; min-height: 100vh; }
+
+  /* ===== AUTH ===== */
+  #auth-screen { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; padding: 24px; }
+  .auth-card { background: white; border-radius: 20px; padding: 32px 24px; width: 100%; max-width: 360px; border: 0.5px solid #e0ddd6; }
+  .auth-title { font-size: 22px; font-weight: 500; text-align: center; margin-bottom: 6px; }
+  .auth-sub { font-size: 13px; color: #888; text-align: center; margin-bottom: 28px; }
+  .auth-input { width: 100%; border: 0.5px solid #d0cdc6; border-radius: 10px; padding: 11px 14px; font-size: 14px; margin-bottom: 10px; outline: none; }
+  .auth-input:focus { border-color: #378ADD; }
+  .btn-primary { width: 100%; padding: 12px; font-size: 14px; font-weight: 500; border-radius: 10px; border: none; background: #1D9E75; color: white; cursor: pointer; margin-bottom: 10px; }
+  .btn-primary:hover { opacity: .9; }
+  .btn-google { width: 100%; padding: 12px; font-size: 14px; font-weight: 500; border-radius: 10px; border: 0.5px solid #d0cdc6; background: white; color: #333; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; }
+  .btn-google:hover { background: #f8f8f8; }
+  .auth-divider { display: flex; align-items: center; gap: 10px; margin: 14px 0; color: #bbb; font-size: 12px; }
+  .auth-divider::before, .auth-divider::after { content: ''; flex: 1; height: 0.5px; background: #e0ddd6; }
+  .auth-toggle { font-size: 13px; color: #888; text-align: center; margin-top: 16px; }
+  .auth-toggle a { color: #1D9E75; cursor: pointer; text-decoration: none; }
+  .auth-error { font-size: 12px; color: #D85A30; margin-bottom: 10px; text-align: center; min-height: 18px; }
+
+  /* ===== MAIN APP ===== */
+  #app-screen { display: none; flex-direction: column; min-height: 100vh; }
+  .topbar { background: white; padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; border-bottom: 0.5px solid #e0ddd6; position: sticky; top: 0; z-index: 10; }
+  .topbar-title { font-size: 15px; font-weight: 500; }
+  .pt-badge { background: #FAEEDA; color: #633806; border-radius: 12px; padding: 3px 10px; font-size: 12px; font-weight: 500; }
+
+  /* MAP TABS */
+  .map-tabs { display: flex; background: white; border-bottom: 0.5px solid #e0ddd6; }
+  .map-tab { flex: 1; padding: 10px 4px; font-size: 12px; font-weight: 500; text-align: center; color: #888; border: none; background: none; cursor: pointer; border-bottom: 2px solid transparent; }
+  .map-tab.active { color: #1D9E75; border-bottom-color: #1D9E75; }
+
+  /* MAP CANVAS */
+  .map-container { padding: 12px; }
+  .map-canvas { position: relative; background: #edeae2; border-radius: 12px; overflow: hidden; width: 100%; }
+  .map-canvas.route-map { height: 280px; }
+  .map-canvas.outside-map { height: 340px; }
+  .map-canvas.inside-map { height: 380px; }
+
+  .place-block { position: absolute; border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; transition: transform .12s, background .3s, border-color .3s; border: 1.5px solid #b0ada6; background: #c8c4bc; user-select: none; }
+  .place-block:active { transform: scale(.94); }
+  .place-block.fog::after { content: '?'; font-size: 20px; color: #aaa; font-weight: 500; }
+  .place-block.fog .pb-emoji, .place-block.fog .pb-name { display: none; }
+  .pb-emoji { font-size: 20px; line-height: 1; }
+  .pb-name { font-size: 9px; font-weight: 500; margin-top: 2px; text-align: center; line-height: 1.3; padding: 0 2px; }
+  .pb-badge { position: absolute; top: -9px; right: -9px; width: 20px; height: 20px; border-radius: 50%; background: white; border: 1.5px solid #ccc; display: flex; align-items: center; justify-content: center; font-size: 12px; z-index: 3; }
+
+  /* ROAD (route map) */
+  .road { position: absolute; background: white; opacity: .7; border-radius: 3px; }
+
+  /* PICKER SHEET */
+  .picker-sheet { background: white; border-top: 0.5px solid #e0ddd6; padding: 16px; }
+  .picker-place { font-size: 14px; font-weight: 500; margin-bottom: 12px; display: flex; align-items: center; gap: 6px; }
+  .feel-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .feel-card { border-radius: 12px; padding: 12px 6px 10px; border: 1.5px solid #e0ddd6; background: #f8f6f2; cursor: pointer; text-align: center; transition: all .14s; }
+  .feel-card:hover { transform: scale(1.04); }
+  .feel-card.selected { border-width: 2px; }
+  .feel-card .fc-icon { font-size: 26px; display: block; }
+  .feel-card .fc-label { font-size: 10px; font-weight: 500; display: block; margin-top: 4px; }
+  .btn-confirm { display: block; width: 100%; margin-top: 12px; padding: 12px; font-size: 14px; font-weight: 500; border-radius: 12px; border: none; color: white; background: #1D9E75; cursor: pointer; }
+  .btn-confirm:disabled { background: #c0c0c0; cursor: default; }
+
+  .idle-hint { padding: 16px; font-size: 13px; color: #888; text-align: center; }
+
+  /* POINTS LOG */
+  .section-title { font-size: 12px; font-weight: 500; color: #888; letter-spacing: .04em; padding: 12px 16px 6px; }
+  .log-item { display: flex; align-items: center; gap: 10px; padding: 10px 16px; border-bottom: 0.5px solid #f0ede6; }
+  .log-emoji { font-size: 18px; }
+  .log-info { flex: 1; }
+  .log-name { font-size: 13px; font-weight: 500; }
+  .log-date { font-size: 11px; color: #aaa; }
+  .log-pt { font-size: 13px; font-weight: 500; color: #BA7517; }
+
+  /* TOAST */
+  .toast { position: fixed; top: 70px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,.75); color: white; border-radius: 20px; padding: 6px 16px; font-size: 12px; font-weight: 500; white-space: nowrap; opacity: 0; transition: opacity .2s; pointer-events: none; z-index: 100; }
+  .toast.show { opacity: 1; }
+
+  /* BOTTOM NAV */
+  .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: white; border-top: 0.5px solid #e0ddd6; display: flex; z-index: 10; }
+  .nav-item { flex: 1; padding: 10px 4px 14px; text-align: center; cursor: pointer; font-size: 10px; color: #aaa; border: none; background: none; }
+  .nav-item.active { color: #1D9E75; }
+  .nav-icon { font-size: 22px; display: block; }
+  .page-content { padding-bottom: 80px; }
+
+  .loading { display: flex; align-items: center; justify-content: center; min-height: 100vh; font-size: 14px; color: #888; }
+</style>
+</head>
+<body>
+
+<div class="loading" id="loading">よみこみ中…🐱</div>
+
+<!-- AUTH -->
+<div id="auth-screen" style="display:none">
+  <div class="auth-card">
+    <div class="auth-title">🐱 ナワバリゲーム</div>
+    <div class="auth-sub" id="auth-sub">ログインしてはじめよう</div>
+    <div class="auth-error" id="auth-error"></div>
+    <input class="auth-input" type="email" id="auth-email" placeholder="メールアドレス">
+    <input class="auth-input" type="password" id="auth-password" placeholder="パスワード">
+    <button class="btn-primary" id="auth-submit-btn" onclick="submitAuth()">ログイン</button>
+    <div class="auth-divider">または</div>
+    <button class="btn-google" onclick="loginGoogle()">
+      <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.875 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z"/><path fill="#FBBC05" d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 6.29C4.672 4.163 6.656 3.58 9 3.58z"/></svg>
+      Googleでログイン
+    </button>
+    <div class="auth-toggle" id="auth-toggle">
+      アカウントがない場合は <a onclick="toggleAuthMode()">新規登録</a>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- MAIN APP -->
+<div id="app-screen" style="display:none">
+  <div class="topbar">
+    <span class="topbar-title" id="topbar-title">🐱 ナワバリゲーム</span>
+    <div style="display:flex;align-items:center;gap:8px">
+      <span class="pt-badge" id="pt-display">0 pt</span>
+      <button onclick="logout()" style="font-size:11px;color:#aaa;border:none;background:none;cursor:pointer">ログアウト</button>
+    </div>
+  </div>
+
+  <!-- MAP PAGE -->
+  <div id="page-map" class="page-content">
+    <div class="map-tabs">
+      <button class="map-tab active" onclick="switchMap('route')">🏠 ルート</button>
+      <button class="map-tab" onclick="switchMap('outside')">🏫 校舎外</button>
+      <button class="map-tab" onclick="switchMap('inside')">🏛️ 校舎内</button>
+    </div>
+    <div class="map-container">
+      <div class="map-canvas route-map" id="map-canvas"></div>
+    </div>
+    <div id="picker-area">
+      <div class="idle-hint" id="idle-hint">🐾 グレーの場所をタップしてナワバリ度をつけよう</div>
+      <div class="picker-sheet" id="picker-sheet" style="display:none">
+        <div class="picker-place" id="picker-place-name"></div>
+        <div class="feel-grid">
+          <div class="feel-card" id="fc0" onclick="selectFeel(0)">
+            <span class="fc-icon">😊</span>
+            <span class="fc-label" style="color:#085041">安心</span>
+          </div>
+          <div class="feel-card" id="fc1" onclick="selectFeel(1)">
+            <span class="fc-icon">😐</span>
+            <span class="fc-label" style="color:#633806">まだ警戒</span>
+          </div>
+          <div class="feel-card" id="fc2" onclick="selectFeel(2)">
+            <span class="fc-icon">😰</span>
+            <span class="fc-label" style="color:#712B13">警戒バリバリ</span>
+          </div>
+        </div>
+        <button class="btn-confirm" id="btn-confirm" disabled onclick="confirmFeel()">ナワバリに追加する</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- POINTS PAGE -->
+  <div id="page-points" class="page-content" style="display:none">
+    <div class="section-title">ポイント履歴</div>
+    <div id="points-log"></div>
+  </div>
+
+  <!-- BOTTOM NAV -->
+  <div class="bottom-nav">
+    <button class="nav-item active" id="nav-map" onclick="switchPage('map')">
+      <span class="nav-icon">🗺️</span>マップ
+    </button>
+    <button class="nav-item" id="nav-points" onclick="switchPage('points')">
+      <span class="nav-icon">⭐</span>ポイント
+    </button>
+  </div>
+</div>
+
+<!-- FIREBASE -->
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, signOut } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
+import { getFirestore, doc, getDoc, setDoc, collection, addDoc, getDocs, query, orderBy, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBlwjwiAbTUQxYDY6eMCkVZ7xliWtMZ4Zw",
+  authDomain: "nawabari-game.firebaseapp.com",
+  projectId: "nawabari-game",
+  storageBucket: "nawabari-game.firebasestorage.app",
+  messagingSenderId: "62056190086",
+  appId: "1:62056190086:web:a51baba6070ed4776d4107"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+const googleProvider = new GoogleAuthProvider();
+
+// ===== PLACE MASTER DATA =====
+const MAPS = {
+  route: {
+    label: 'ルート',
+    canvasClass: 'route-map',
+    roads: [
+      { x: 130, y: 0, w: 20, h: 280 },
+    ],
+    places: [
+      { id: 'home',        name: '家',           emoji: '🏠', x: 90,  y: 20,  w: 70, h: 60 },
+      { id: 'route_mid1', name: 'こうえん前',    emoji: '🌳', x: 90,  y: 110, w: 70, h: 60 },
+      { id: 'route_mid2', name: 'おおきいみち',  emoji: '🚦', x: 90,  y: 200, w: 70, h: 60 },
+      { id: 'seimon',     name: '正門',          emoji: '🚪', x: 185, y: 110, w: 70, h: 60 },
+    ]
+  },
+  outside: {
+    label: '校舎外',
+    canvasClass: 'outside-map',
+    roads: [],
+    places: [
+      { id: 'seimon_out',       name: '正門',           emoji: '🚪', x: 120, y: 10,  w: 80, h: 55 },
+      { id: 'entrance_student', name: '生徒用入り口',   emoji: '🎒', x: 10,  y: 10,  w: 90, h: 55 },
+      { id: 'entrance_staff',   name: '職員用入り口',   emoji: '🚶', x: 220, y: 10,  w: 90, h: 55 },
+      { id: 'gym',              name: '体育館',          emoji: '🏃', x: 10,  y: 100, w: 130, h: 80, special: true },
+      { id: 'pool',             name: 'プール',          emoji: '🏊', x: 170, y: 100, w: 140, h: 80 },
+      { id: 'gakudo',           name: '学童',            emoji: '🏠', x: 10,  y: 220, w: 120, h: 70 },
+    ]
+  },
+  inside: {
+    label: '校舎内',
+    canvasClass: 'inside-map',
+    roads: [
+      { x: 0, y: 165, w: 320, h: 18 },
+    ],
+    places: [
+      { id: 'corridor_gym',      name: '体育館の廊下',        emoji: '🚶', x: 10,  y: 10,  w: 140, h: 55 },
+      { id: 'toilet_gym',        name: 'トイレ（体育館側）', emoji: '🚻', x: 170, y: 10,  w: 140, h: 55 },
+      { id: 'support_common',    name: '支援教室（みんな）', emoji: '👥', x: 10,  y: 90,  w: 140, h: 65 },
+      { id: 'support_own',       name: '支援教室（自分の机）', emoji: '🪑', x: 170, y: 90,  w: 140, h: 65, special: true },
+      { id: 'toilet_support',    name: 'トイレ（支援側）',   emoji: '🚻', x: 10,  y: 200, w: 90,  h: 55 },
+      { id: 'art_room',          name: '図工室',              emoji: '🎨', x: 120, y: 200, w: 90,  h: 55 },
+      { id: 'pc_room',           name: 'パソコン室',          emoji: '💻', x: 230, y: 200, w: 80,  h: 55 },
+      { id: 'library',           name: '図書ホール',          emoji: '📚', x: 10,  y: 300, w: 300, h: 60 },
+    ]
+  }
+};
+
+const FEELS = [
+  { emoji: '😊', label: '安心',        color: '#1D9E75', border: '#0F6E56', textColor: '#085041', pts: 30 },
+  { emoji: '😐', label: 'まだ警戒',    color: '#EF9F27', border: '#BA7517', textColor: '#633806', pts: 20 },
+  { emoji: '😰', label: '警戒バリバリ', color: '#D85A30', border: '#993C1D', textColor: '#712B13', pts: 10 },
+];
+
+// ===== STATE =====
+let currentUser = null;
+let nawabariState = {};
+let totalPts = 0;
+let currentMap = 'route';
+let activePick = null;
+let selectedFeel = -1;
+let isLoginMode = true;
+
+// ===== AUTH STATE =====
+onAuthStateChanged(auth, user => {
+  document.getElementById('loading').style.display = 'none';
+  if (user) {
+    currentUser = user;
+    document.getElementById('auth-screen').style.display = 'none';
+    document.getElementById('app-screen').style.display = 'flex';
+    document.getElementById('app-screen').style.flexDirection = 'column';
+    loadData();
+  } else {
+    currentUser = null;
+    document.getElementById('auth-screen').style.display = 'flex';
+    document.getElementById('app-screen').style.display = 'none';
+  }
+});
+
+// ===== AUTH FUNCTIONS =====
+window.toggleAuthMode = () => {
+  isLoginMode = !isLoginMode;
+  document.getElementById('auth-sub').textContent = isLoginMode ? 'ログインしてはじめよう' : 'あたらしいアカウントをつくる';
+  document.getElementById('auth-submit-btn').textContent = isLoginMode ? 'ログイン' : '新規登録';
+  document.getElementById('auth-toggle').innerHTML = isLoginMode
+    ? 'アカウントがない場合は <a onclick="toggleAuthMode()">新規登録</a>'
+    : 'すでにアカウントがある場合は <a onclick="toggleAuthMode()">ログイン</a>';
+  document.getElementById('auth-error').textContent = '';
+};
+
+window.submitAuth = async () => {
+  const email = document.getElementById('auth-email').value.trim();
+  const password = document.getElementById('auth-password').value;
+  document.getElementById('auth-error').textContent = '';
+  try {
+    if (isLoginMode) {
+      await signInWithEmailAndPassword(auth, email, password);
+    } else {
+      await createUserWithEmailAndPassword(auth, email, password);
+    }
+  } catch (e) {
+    const msgs = {
+      'auth/user-not-found': 'メールアドレスが見つかりません',
+      'auth/wrong-password': 'パスワードが違います',
+      'auth/email-already-in-use': 'このメールアドレスはすでに登録済みです',
+      'auth/weak-password': 'パスワードは6文字以上にしてください',
+      'auth/invalid-email': 'メールアドレスの形式が正しくありません',
+      'auth/invalid-credential': 'メールアドレスまたはパスワードが違います',
+    };
+    document.getElementById('auth-error').textContent = msgs[e.code] || 'エラーが発生しました: ' + e.code;
+  }
+};
+
+window.loginGoogle = async () => {
+  try {
+    await signInWithPopup(auth, googleProvider);
+  } catch (e) {
+    document.getElementById('auth-error').textContent = 'Googleログインに失敗しました';
+  }
+};
+
+window.logout = async () => {
+  await signOut(auth);
+};
+
+// ===== LOAD DATA =====
+async function loadData() {
+  if (!currentUser) return;
+  nawabariState = {};
+  totalPts = 0;
+
+  // Load nawabari
+  const snap = await getDocs(collection(db, 'users', currentUser.uid, 'nawabari'));
+  snap.forEach(d => { nawabariState[d.id] = d.data().level; });
+
+  // Load total points
+  const psnap = await getDocs(collection(db, 'users', currentUser.uid, 'points'));
+  psnap.forEach(d => { totalPts += (d.data().pts || 0); });
+
+  updatePtDisplay();
+  renderMap(currentMap);
+  renderPointsLog();
+}
+
+// ===== MAP RENDER =====
+window.switchMap = (mapId) => {
+  currentMap = mapId;
+  document.querySelectorAll('.map-tab').forEach((t, i) => {
+    t.classList.toggle('active', ['route','outside','inside'][i] === mapId);
+  });
+  closePicker();
+  renderMap(mapId);
+};
+
+function renderMap(mapId) {
+  const mapData = MAPS[mapId];
+  const canvas = document.getElementById('map-canvas');
+  canvas.className = 'map-canvas ' + mapData.canvasClass;
+  canvas.innerHTML = '';
+
+  // Roads
+  (mapData.roads || []).forEach(r => {
+    const el = document.createElement('div');
+    el.className = 'road';
+    el.style.cssText = `left:${r.x}px;top:${r.y}px;width:${r.w}px;height:${r.h}px;`;
+    canvas.appendChild(el);
+  });
+
+  // Places
+  mapData.places.forEach(p => {
+    const level = nawabariState[p.id];
+    const hasLevel = level !== undefined && level !== null;
+    const feel = hasLevel ? FEELS[level] : null;
+
+    const el = document.createElement('div');
+    el.className = 'place-block' + (hasLevel ? '' : ' fog');
+    el.style.cssText = `left:${p.x}px;top:${p.y}px;width:${p.w}px;height:${p.h}px;`;
+
+    if (hasLevel) {
+      el.style.background = feel.color + '33';
+      el.style.borderColor = feel.border;
+      el.innerHTML = `<span class="pb-emoji">${p.emoji}</span><span class="pb-name" style="color:${feel.textColor}">${p.name}</span>`;
+      const badge = document.createElement('div');
+      badge.className = 'pb-badge';
+      badge.style.borderColor = feel.border;
+      badge.textContent = feel.emoji;
+      el.appendChild(badge);
+    } else {
+      el.innerHTML = `<span class="pb-emoji">${p.emoji}</span><span class="pb-name">${p.name}</span>`;
+    }
+
+    if (p.special) {
+      const star = document.createElement('div');
+      star.style.cssText = 'position:absolute;top:-9px;left:-9px;font-size:14px;';
+      star.textContent = '⭐';
+      el.appendChild(star);
+    }
+
+    el.onclick = () => openPicker(p, el);
+    canvas.appendChild(el);
+  });
+}
+
+// ===== PICKER =====
+function openPicker(place, el) {
+  document.querySelectorAll('.place-block').forEach(b => b.style.outline = 'none');
+  el.style.outline = '2.5px solid #378ADD';
+  el.style.outlineOffset = '2px';
+
+  activePick = place;
+  selectedFeel = -1;
+
+  document.getElementById('idle-hint').style.display = 'none';
+  document.getElementById('picker-sheet').style.display = 'block';
+  document.getElementById('picker-place-name').innerHTML = `<span style="font-size:18px">${place.emoji}</span>${place.name}`;
+  document.getElementById('btn-confirm').disabled = true;
+
+  [0,1,2].forEach(i => {
+    const fc = document.getElementById('fc'+i);
+    fc.classList.remove('selected');
+    fc.style.background = '';
+    fc.style.borderColor = '';
+  });
+
+  const cur = nawabariState[place.id];
+  if (cur !== undefined && cur !== null) selectFeel(cur);
+}
+
+function closePicker() {
+  activePick = null;
+  selectedFeel = -1;
+  document.getElementById('picker-sheet').style.display = 'none';
+  document.getElementById('idle-hint').style.display = 'block';
+  document.getElementById('idle-hint').textContent = '🐾 グレーの場所をタップしてナワバリ度をつけよう';
+  document.querySelectorAll('.place-block').forEach(b => b.style.outline = 'none');
+}
+
+window.selectFeel = (idx) => {
+  selectedFeel = idx;
+  [0,1,2].forEach(i => {
+    const fc = document.getElementById('fc'+i);
+    fc.classList.toggle('selected', i === idx);
+    fc.style.background = i === idx ? FEELS[i].color + '22' : '';
+    fc.style.borderColor = i === idx ? FEELS[i].border : '';
+  });
+  document.getElementById('btn-confirm').disabled = false;
+};
+
+window.confirmFeel = async () => {
+  if (!activePick || selectedFeel < 0 || !currentUser) return;
+  const place = activePick;
+  const feel = FEELS[selectedFeel];
+  const wasSet = nawabariState[place.id] !== undefined && nawabariState[place.id] !== null;
+
+  // Save nawabari level
+  await setDoc(doc(db, 'users', currentUser.uid, 'nawabari', place.id), {
+    level: selectedFeel,
+    placeName: place.name,
+    updatedAt: serverTimestamp()
+  });
+
+  nawabariState[place.id] = selectedFeel;
+
+  // Points
+  let pts = wasSet ? 5 : feel.pts;
+  let bonusMsg = '';
+
+  if (!wasSet && place.special && selectedFeel === 0) {
+    pts += 20;
+    bonusMsg = ' ⭐ボーナス！';
+  }
+
+  await addDoc(collection(db, 'users', currentUser.uid, 'points'), {
+    type: 'nawabari',
+    placeId: place.id,
+    placeName: place.name,
+    feel: feel.label,
+    pts,
+    createdAt: serverTimestamp()
+  });
+
+  totalPts += pts;
+  updatePtDisplay();
+  renderMap(currentMap);
+  renderPointsLog();
+  closePicker();
+  showToast(`+${pts}pt！${bonusMsg} ナワバリかくだい！`);
+};
+
+// ===== POINTS LOG =====
+async function renderPointsLog() {
+  if (!currentUser) return;
+  const container = document.getElementById('points-log');
+  container.innerHTML = '';
+
+  const q = query(collection(db, 'users', currentUser.uid, 'points'), orderBy('createdAt', 'desc'));
+  const snap = await getDocs(q);
+
+  if (snap.empty) {
+    container.innerHTML = '<div style="padding:32px;text-align:center;color:#aaa;font-size:13px">まだポイントがありません<br>マップで場所をナワバリ化しよう！</div>';
+    return;
+  }
+
+  snap.forEach(d => {
+    const data = d.data();
+    const date = data.createdAt ? new Date(data.createdAt.seconds * 1000).toLocaleDateString('ja-JP', { month: 'short', day: 'numeric' }) : '';
+    const item = document.createElement('div');
+    item.className = 'log-item';
+    const feelEmoji = { '安心': '😊', 'まだ警戒': '😐', '警戒バリバリ': '😰' };
+    item.innerHTML = `
+      <span class="log-emoji">${feelEmoji[data.feel] || '⭐'}</span>
+      <div class="log-info">
+        <div class="log-name">${data.placeName || ''}</div>
+        <div class="log-date">${date} · ${data.feel || ''}</div>
+      </div>
+      <span class="log-pt">+${data.pts}pt</span>
+    `;
+    container.appendChild(item);
+  });
+}
+
+// ===== UTILS =====
+function updatePtDisplay() {
+  document.getElementById('pt-display').textContent = totalPts + ' pt';
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+window.switchPage = (page) => {
+  ['map','points'].forEach(p => {
+    document.getElementById('page-'+p).style.display = p === page ? 'block' : 'none';
+    document.getElementById('nav-'+p).classList.toggle('active', p === page);
+  });
+  if (page === 'points') renderPointsLog();
+};
+
+</script>
+</body>
+</html>
