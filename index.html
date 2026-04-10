@@ -468,18 +468,22 @@ async function loadData() {
   placesData = { route:[], outside:[], inside:[] };
 
   // Load custom places from Firestore
+  // デフォルト場所は個別にチェックして、なければ追加する（新しい場所を後から追加しても反映される）
   for (const mapId of ['route','outside','inside']) {
     const snap = await getDocs(collection(db, 'users', currentUser.uid, 'places_' + mapId));
-    if (snap.empty) {
-      // First time: write defaults
-      for (const p of DEFAULT_PLACES[mapId]) {
+    const existingIds = new Set();
+    snap.forEach(d => {
+      existingIds.add(d.id);
+      placesData[mapId].push({ id: d.id, ...d.data() });
+    });
+    // デフォルト場所のうち未保存のものだけ追加
+    for (const p of DEFAULT_PLACES[mapId]) {
+      if (!existingIds.has(p.id)) {
         await setDoc(doc(db, 'users', currentUser.uid, 'places_' + mapId, p.id), p);
         placesData[mapId].push({...p});
       }
-    } else {
-      snap.forEach(d => placesData[mapId].push({ id: d.id, ...d.data() }));
-      placesData[mapId].sort((a,b) => (a.order||0) - (b.order||0));
     }
+    placesData[mapId].sort((a,b) => (a.order||0) - (b.order||0));
   }
 
   // Load nawabari
@@ -508,7 +512,13 @@ window.switchMap = (mapId) => {
 function renderMap(mapId) {
   const canvas = document.getElementById('map-canvas');
   canvas.innerHTML = '';
-  canvas.style.height = MAP_HEIGHTS[mapId] + 'px';
+
+  const places = placesData[mapId] || [];
+
+  // キャンバス高さ：場所の最大y+hか固定値の大きい方
+  let maxBottom = MAP_HEIGHTS[mapId];
+  places.forEach(p => { maxBottom = Math.max(maxBottom, (p.y || 0) + (p.h || 55) + 20); });
+  canvas.style.height = maxBottom + 'px';
 
   (MAP_ROADS[mapId] || []).forEach(r => {
     const el = document.createElement('div');
@@ -517,7 +527,7 @@ function renderMap(mapId) {
     canvas.appendChild(el);
   });
 
-  (placesData[mapId] || []).forEach(p => {
+  places.forEach(p => {
     const ns = nawabariState[p.id];
     const hasLevel = ns && ns.level !== undefined && ns.level !== null;
     const feel = hasLevel ? FEELS[ns.level] : null;
@@ -795,10 +805,13 @@ window.saveEdit = async () => {
   } else {
     const newId = 'place_' + Date.now();
     const existing = placesData[currentMap];
+    // 既存場所の最大yの下に追加
+    let nextY = 10;
+    existing.forEach(p => { nextY = Math.max(nextY, (p.y || 0) + (p.h || 55) + 10); });
     const newPlace = {
       id: newId, name, emoji: selectedEmoji,
-      x: 10, y: 10 + existing.length * 70,
-      w: 120, h: 55, special: false, order: existing.length
+      x: 10, y: nextY,
+      w: 130, h: 55, special: false, order: existing.length
     };
     await setDoc(doc(db, 'users', currentUser.uid, 'places_' + currentMap, newId), newPlace);
     placesData[currentMap].push(newPlace);
